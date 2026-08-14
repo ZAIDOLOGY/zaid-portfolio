@@ -24,7 +24,7 @@ export function FadeIn({ children, delay = 0, direction = "up", className }: Fad
     <motion.div
       initial={{ opacity: 0, ...directions[direction] }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      viewport={{ once: false, margin: "0px" }}
       transition={{
         duration: 0.8,
         delay,
@@ -54,7 +54,7 @@ export function StaggerContainer({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      viewport={{ once: false, margin: "0px" }}
       variants={{
         hidden: {},
         visible: {
@@ -121,15 +121,15 @@ export function MaskReveal({
       <motion.div
         variants={{
           hidden: { x: startX, y: startY },
-          visible: {
-            x: "0%",
-            y: "0%",
-            transition: { duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }
+          visible: { 
+            x: "0%", 
+            y: "0%", 
+            transition: { duration: 1.6, delay, ease: [0.16, 1, 0.3, 1] } 
           }
         }}
         initial={useParentTrigger ? undefined : "hidden"}
         whileInView={useParentTrigger ? undefined : "visible"}
-        viewport={useParentTrigger ? undefined : { once: true, margin: "0px 0px -10% 0px" }}
+        viewport={useParentTrigger ? undefined : { once: false, margin: "0px" }}
       >
         {children}
       </motion.div>

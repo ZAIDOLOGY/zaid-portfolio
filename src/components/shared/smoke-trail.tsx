@@ -17,24 +17,19 @@ export function SmokeTrail() {
     if (window.matchMedia("(pointer: coarse)").matches) {
       return;
     }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
 
     const moveCursor = (e: MouseEvent) => {
-      // Offset by half the size of the orb (500px / 2 = 250px)
-      cursorX.set(e.clientX - 250);
-      cursorY.set(e.clientY - 250);
-      setIsVisible(true);
+      // Offset by half the size of the massive orb (600px / 2 = 300px)
+      cursorX.set(e.clientX - 300);
+      cursorY.set(e.clientY - 300);
+      if (!isVisible) setIsVisible(true);
     };
 
-    window.addEventListener("mousemove", moveCursor, { passive: true });
+    window.addEventListener("mousemove", moveCursor);
     return () => {
       window.removeEventListener("mousemove", moveCursor);
     };
-    // isVisible is intentionally not a dependency — including it tore down and
-    // re-attached the listener on the first mouse move.
-  }, [cursorX, cursorY]);
+  }, [cursorX, cursorY, isVisible]);
 
   if (!isVisible) return null;
 
@@ -44,11 +39,8 @@ export function SmokeTrail() {
       style={{
         x: cursorXSpring,
         y: cursorYSpring,
-        // No filter: blur() here. A 60px blur on a 500px element forced a
-        // full-screen repaint on every mouse move; the radial gradient already
-        // falls off softly enough to read as a glow on its own.
-        background:
-          "radial-gradient(circle, rgba(16,124,65,0.28) 0%, rgba(33,200,120,0.14) 35%, rgba(16,124,65,0.05) 55%, rgba(16,124,65,0) 72%)",
+        background: "radial-gradient(circle, rgba(16,124,65,0.4) 0%, rgba(33,200,120,0.15) 40%, rgba(16,124,65,0) 70%)",
+        filter: "blur(60px)",
       }}
     />
   );
