@@ -104,4 +104,21 @@
     @apply font-sans;
     scroll-behavior: smooth;
   }
+
+  /* Respect the OS-level setting. Without this the parallax, the infinite
+     background animations and the smooth anchor scrolling all keep running for
+     users who have asked the system to stop motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

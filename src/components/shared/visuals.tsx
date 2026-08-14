@@ -129,14 +129,13 @@ export function FloatingAmoeba({
   return (
     <div className={cn("absolute z-0 pointer-events-none flex items-center justify-center opacity-90", className)} style={style}>
       <motion.div
+        // Only transform properties are animated here. The previous version keyframed
+        // borderRadius, which the compositor cannot handle — it repainted all 18 of
+        // these every frame, permanently. The organic shape is now static and the
+        // motion comes from rotate/scale, which run on the GPU.
         animate={{
-          borderRadius: [
-            "20% 80% 30% 70% / 70% 30% 80% 20%",
-            "80% 20% 70% 30% / 30% 70% 20% 80%",
-            "40% 60% 20% 80% / 80% 20% 60% 40%",
-            "20% 80% 30% 70% / 70% 30% 80% 20%",
-          ],
           rotate: [0, 90, 180, 360],
+          scale: [1, 1.06, 0.97, 1],
         }}
         transition={{
           duration: 15,
@@ -144,8 +143,9 @@ export function FloatingAmoeba({
           ease: "linear",
           delay: delay,
         }}
-        className="absolute inset-0 shadow-xl backdrop-blur-md"
+        className="absolute inset-0 shadow-xl"
         style={{
+          borderRadius: "20% 80% 30% 70% / 70% 30% 80% 20%",
           background: "linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%)",
         }}
       />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, ReactNode } from "react";
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ParallaxLayerProps {
@@ -12,41 +12,36 @@ interface ParallaxLayerProps {
   style?: React.CSSProperties;
 }
 
-export function ParallaxLayer({ 
-  children, 
-  offset = 50, 
-  className, 
+export function ParallaxLayer({
+  children,
+  offset = 50,
+  className,
   direction = "up",
   style
 }: ParallaxLayerProps) {
   const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  // Smooth the scroll progress to avoid jitter
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  // Calculate movement range
+  // Drive the transform straight off scroll progress. A spring here would add a
+  // second animation loop per layer (24 of them on the homepage) purely to smooth
+  // a value that is already frame-aligned with the scroll.
   const yRange = direction === "up" ? [offset, -offset] : [-offset, offset];
-  const y = useTransform(smoothProgress, [0, 1], yRange);
+  const y = useTransform(scrollYProgress, [0, 1], yRange);
 
   if (prefersReducedMotion) {
     return <div className={cn("relative", className)} style={style}>{children}</div>;
   }
 
   return (
-    <motion.div 
-      ref={ref} 
-      style={{ y, ...style }} 
-      className={cn("relative will-change-transform", className)}
+    <motion.div
+      ref={ref}
+      style={{ y, ...style }}
+      className={cn("relative", className)}
     >
       {children}
     </motion.div>
@@ -62,23 +57,16 @@ interface ScrollFadeSectionProps {
 export function ScrollFadeSection({ children, className, id }: ScrollFadeSectionProps) {
   const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  // Fade out as it leaves the top of the screen (progress near 1)
-  // Fade in as it enters the bottom (progress near 0)
-  // Full opacity in the middle (0.2 to 0.8)
-  const opacity = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0.3, 1, 1, 0.3]);
-  const scale = useTransform(smoothProgress, [0, 0.2, 0.8, 1], [0.95, 1, 1, 0.95]);
+  // Opacity only. Scaling a whole section forces the browser to re-rasterize its
+  // entire subtree on every frame, and the old 0.3 floor meant content spent most
+  // of the scroll visibly dimmed.
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.6, 1, 1, 0.6]);
 
   if (prefersReducedMotion) {
     return (
@@ -89,11 +77,11 @@ export function ScrollFadeSection({ children, className, id }: ScrollFadeSection
   }
 
   return (
-    <motion.section 
+    <motion.section
       id={id}
-      ref={ref} 
-      style={{ opacity, scale }} 
-      className={cn("relative will-change-transform", className)}
+      ref={ref}
+      style={{ opacity }}
+      className={cn("relative", className)}
     >
       {children}
     </motion.section>
